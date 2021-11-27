@@ -104,7 +104,7 @@ function setupCameraAndControls(scene: THREE.Scene) {
 
     controls = new TrackballControls(camera, renderer.domElement)
     controls.rotateSpeed = 1.0
-    controls.zoomSpeed = 1.2
+    controls.zoomSpeed = 0
     controls.panSpeed = 0.8
     controls.keys = ['KeyA', 'KeyS', 'KeyD']
 }
