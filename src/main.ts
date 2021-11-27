@@ -2,15 +2,14 @@ import * as THREE from 'three'
 
 import { centerDataPoints, getRandomAlignedPointToTarget } from './utils';
 
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls'
 import { Vector3 } from 'three';
 import data from '../resources/samples/pentagram.json'
 
-let windowContext: any = window;
 let camera: THREE.PerspectiveCamera
 let scene: THREE.Scene
 let renderer: THREE.WebGLRenderer
-let controls: OrbitControls
+let controls: TrackballControls
 
 const SKIP_POINTS = 15;
 let startPoints: THREE.Mesh[] = []
@@ -66,65 +65,61 @@ function setupWorld() {
         previousRandomizedProjection = randomizedProjection
     }
 
-    // TODO: Set random initial position for x and z sin and cos with y=0
-    // camera.position.copy(new Vector3())
+    const randomTheta = Math.max(20, Math.min(360 * Math.random(), 240))
+    const randomCameraX = 3 * Math.cos(randomTheta)
+    const randomCameraZ = 3 * Math.sin(randomTheta)
+    
+    camera.position.copy(new Vector3(randomCameraX, 0, randomCameraZ))
 }
 
 function setupScene() {
-    scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x350089, 0.002);
+    scene = new THREE.Scene()
+    scene.fog = new THREE.FogExp2(0x350089, 0.002)
 
     /* const axesHelper = new THREE.AxesHelper();
     axesHelper.setColors(0xff0000, 0x00ff00, 0x0000ff)
     scene.add(axesHelper); */
 
-    const loader = new THREE.TextureLoader();
-    const bgTexture = loader.load('resources/images/sky.jpg');
-    scene.background = bgTexture;
+    const loader = new THREE.TextureLoader()
+    const bgTexture = loader.load('resources/images/sky.jpg')
+    scene.background = bgTexture
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer = new THREE.WebGLRenderer({ antialias: true })
+    renderer.setPixelRatio(window.devicePixelRatio)
+    renderer.setSize(window.innerWidth, window.innerHeight)
 
-    document.body.appendChild(renderer.domElement);
-    window.addEventListener('resize', onWindowResize);
+    document.body.appendChild(renderer.domElement)
+    window.addEventListener('resize', onWindowResize)
 
-    return scene;
+    return scene
 }
 
 function setupCameraAndControls(scene: THREE.Scene) {
-    const near = 0.1;
-    const far = 10;
+    const near = 0.1
+    const far = 10
 
-    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, near, far);
-    camera.position.set(0, 0, 3);
-    camera.lookAt(scene.position);
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, near, far)
+    camera.position.set(0, 0, 3)
+    camera.lookAt(scene.position)
 
-    controls = new OrbitControls(camera, renderer.domElement);
-    controls.listenToKeyEvents(windowContext);
-
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-
-    controls.screenSpacePanning = false;
-
-    controls.minDistance = near;
-    controls.maxDistance = far;
-
-    controls.maxPolarAngle = Math.PI / 2;
+    controls = new TrackballControls(camera, renderer.domElement)
+    controls.rotateSpeed = 1.0
+    controls.zoomSpeed = 1.2
+    controls.panSpeed = 0.8
+    controls.keys = ['KeyA', 'KeyS', 'KeyD']
 }
 
 function setupIllumination() {
-    const dirLight1 = new THREE.DirectionalLight(0xffffff);
-    dirLight1.position.set(1, 1, 1);
-    scene.add(dirLight1);
+    const dirLight1 = new THREE.DirectionalLight(0xffffff)
+    dirLight1.position.set(1, 1, 1)
+    scene.add(dirLight1)
 
-    const dirLight2 = new THREE.DirectionalLight(0x002288);
-    dirLight2.position.set(- 1, - 1, - 1);
-    scene.add(dirLight2);
+    const dirLight2 = new THREE.DirectionalLight(0x002288)
+    dirLight2.position.set(- 1, - 1, - 1)
+    scene.add(dirLight2)
 
-    const ambientLight = new THREE.AmbientLight(0x222222);
-    scene.add(ambientLight);
+    const ambientLight = new THREE.AmbientLight(0x222222)
+    scene.add(ambientLight)
 }
 
 function checkAlignmentAndShowLines() {
@@ -138,9 +133,10 @@ function checkAlignmentAndShowLines() {
 }
 
 function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight
+    camera.updateProjectionMatrix()
+
+    renderer.setSize(window.innerWidth, window.innerHeight)
 }
 
 function animate() {
