@@ -14,8 +14,8 @@ export function centerDataPoints(points: DataPoint[]): DataPoint[] {
 }
 
 export function getRandomAlignedPointToTarget(cameraPosition: THREE.Vector3, targetPosition: THREE.Vector3): THREE.Vector3 {
-    console.log(cameraPosition, targetPosition);
     const unitary = targetPosition.sub(cameraPosition).normalize()
-    const offset = unitary.multiplyScalar(Math.random() > 0.5 ? -1 : 1)
-    return targetPosition.add(offset)
+    // TODO: Sum from camera z offset inst
+    const offset = unitary.multiplyScalar(3 + 2 *(Math.random() - 0.5))
+    return cameraPosition.add(offset)
 }

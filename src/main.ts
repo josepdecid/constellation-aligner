@@ -28,7 +28,7 @@ function init() {
 
 function setupWorld() {
     const dataPath = centerDataPoints(data)
-    
+
     let nextRandomizedZ = Math.random()
     let randomizedZ = Math.random()
 
@@ -37,11 +37,13 @@ function setupWorld() {
         const material = new THREE.MeshPhongMaterial({ color: 0xFFFFFF, flatShading: true })
         const geometry = new THREE.DodecahedronGeometry(0.025, 10)
 
+        const randomizedProjection = getRandomAlignedPointToTarget(
+            new Vector3().copy(camera.position),
+            new Vector3(dataPath[i].x, dataPath[i].y, 0)
+        )
+
         const mesh = new THREE.Mesh(geometry, material)
-        const randomizedPosition = getRandomAlignedPointToTarget(camera.position, new Vector3(dataPath[i].x, dataPath[i].y, 0))
-        mesh.position.x = randomizedPosition.x
-        mesh.position.y = randomizedPosition.y
-        mesh.position.z = randomizedPosition.z
+        mesh.position.copy(randomizedProjection)
 
         mesh.updateMatrix()
         mesh.matrixAutoUpdate = false
