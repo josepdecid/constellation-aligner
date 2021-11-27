@@ -3,7 +3,6 @@ import * as THREE from 'three'
 import { centerDataPoints, getRandomAlignedPointToTarget } from './utils';
 
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls'
-import { Vector3 } from 'three';
 import data from '../resources/samples/pentagram.json'
 
 let camera: THREE.PerspectiveCamera
@@ -69,7 +68,7 @@ function setupWorld() {
     const randomCameraX = 3 * Math.cos(randomTheta)
     const randomCameraZ = 3 * Math.sin(randomTheta)
     
-    camera.position.copy(new Vector3(randomCameraX, 0, randomCameraZ))
+    camera.position.copy(new THREE.Vector3(randomCameraX, 0, randomCameraZ))
 }
 
 function setupScene() {
