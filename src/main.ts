@@ -1,8 +1,9 @@
 import * as THREE from 'three'
 
+import { centerDataPoints, getRandomAlignedPointToTarget } from './utils';
+
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { Vector3 } from 'three';
-import { centerDataPoints } from './utils';
 import data from '../resources/samples/pentagram.json'
 
 let windowContext: any = window;
@@ -27,17 +28,20 @@ function init() {
 
 function setupWorld() {
     const dataPath = centerDataPoints(data)
-    for (let i = 0; i < dataPath.length; i += SKIP_POINTS) {
-        const randomizedZPosition = Math.random();
+    
+    let nextRandomizedZ = Math.random()
+    let randomizedZ = Math.random()
 
+    for (let i = 0; i < dataPath.length; i += SKIP_POINTS) {
         // Add points corresponding to the stars
         const material = new THREE.MeshPhongMaterial({ color: 0xFFFFFF, flatShading: true })
         const geometry = new THREE.DodecahedronGeometry(0.025, 10)
 
         const mesh = new THREE.Mesh(geometry, material)
-        mesh.position.x = dataPath[i].x
-        mesh.position.y = dataPath[i].y
-        mesh.position.z = randomizedZPosition
+        const randomizedPosition = getRandomAlignedPointToTarget(camera.position, new Vector3(dataPath[i].x, dataPath[i].y, 0))
+        mesh.position.x = randomizedPosition.x
+        mesh.position.y = randomizedPosition.y
+        mesh.position.z = randomizedPosition.z
 
         mesh.updateMatrix()
         mesh.matrixAutoUpdate = false
@@ -46,18 +50,22 @@ function setupWorld() {
         scene.add(mesh)
 
         // Add lines that join all the points with a parametrized alpha value
-        const lineMaterial = new THREE.LineBasicMaterial({ color: 0xFFFFFF, transparent: true, opacity: 0 })
+        const lineMaterial = new THREE.LineBasicMaterial({ color: 0xFFFFFF, transparent: true, opacity: 1, linewidth: 2 })
         const lineGeometry = new THREE.BufferGeometry().setFromPoints([
             new THREE.Vector3(dataPath[i].x, dataPath[i].y, 0),
-            (i < dataPath.length - SKIP_POINTS)
-                ? new THREE.Vector3(dataPath[i + SKIP_POINTS].x, dataPath[i + SKIP_POINTS].y, 0)
-                : new THREE.Vector3(dataPath[0].x, dataPath[0].y, 0)
+            camera.position
+            /*(i < dataPath.length - SKIP_POINTS)
+                ? new THREE.Vector3(dataPath[i + SKIP_POINTS].x, dataPath[i + SKIP_POINTS].y, randomizedZ)
+                : new THREE.Vector3(dataPath[0].x, dataPath[0].y, nextRandomizedZ)*/
         ])
 
         const linePoint = new THREE.Line(lineGeometry, lineMaterial)
 
         lineSegments.push(linePoint)
         scene.add(linePoint)
+
+        randomizedZ = nextRandomizedZ
+        nextRandomizedZ = Math.random()
     }
 }
 
@@ -121,11 +129,11 @@ function setupIllumination() {
 function checkAlignmentAndShowLines() {
     const cameraDirection = camera.getWorldDirection(new THREE.Vector3(0, 0, 0))
     const cameraAngleDistance = cameraDirection.distanceTo(new Vector3(0, 0, -1))
-    lineSegments.forEach(lineSegment => {
+    /*lineSegments.forEach(lineSegment => {
         (lineSegment.material as THREE.Material).opacity = cameraAngleDistance < 0.5
             ? 2 * (0.5 - cameraAngleDistance) * 0.2
             : 0
-    })
+    })*/
 }
 
 function onWindowResize() {
